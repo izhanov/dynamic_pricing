@@ -88,6 +88,7 @@ en:
 
       rules:
         file:
+          file_format: "file format is invalid"
           headers_mismatch: "headers mismatch"
 
       size?:
