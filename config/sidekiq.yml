@@ -1,0 +1,17 @@
+:concurrency: 5
+staging:
+  :concurrency: 5
+production:
+  :concurrency: 10
+:queues:
+  - default
+
+:scheduler:
+  :schedule:
+    adjust_price_by_competitor:
+      cron: '0 0 * * *'
+      class: 'AdjustPriceByCompetitorJob'
+    adjust_price_by_inventory_levels:
+      cron: '0 */1 * * *'
+      class: 'AdjustPriceByInventoryLevelsJob'
+
