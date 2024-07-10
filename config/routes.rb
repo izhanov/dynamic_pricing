@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
     namespace :web do
       resources :products, only: %i[index show]
+      resources :orders
     end
   end
 end

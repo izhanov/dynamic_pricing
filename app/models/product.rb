@@ -7,4 +7,12 @@ class Product
   field :category, type: String
   field :default_price, type: BigDecimal
   field :qty, type: Integer
+
+
+  def current_price
+  end
+
+  def decrement_qty!(qty = 1)
+    update(qty: self.qty - qty)
+  end
 end
