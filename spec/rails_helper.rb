@@ -62,12 +62,12 @@ RSpec.configure do |config|
   end
 
   # Technically this is unneeded for truncation but is the equivalent of what you are doing
-  config.before(:context) do |example|
+  config.before(:each) do |example|
     DatabaseCleaner.start
   end
 
   # Truncate the DB after each context.
-  config.after(:context) do |example|
+  config.after(:each) do |example|
     DatabaseCleaner.clean
   end
 end
