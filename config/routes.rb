@@ -14,5 +14,9 @@ Rails.application.routes.draw do
         post :import, on: :collection
       end
     end
+
+    namespace :web do
+      resources :products, only: %i[index show]
+    end
   end
 end
