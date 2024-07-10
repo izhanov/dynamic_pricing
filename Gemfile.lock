@@ -86,6 +86,10 @@ GEM
     connection_pool (2.4.1)
     crass (1.0.6)
     csv (3.3.0)
+    database_cleaner-core (2.0.1)
+    database_cleaner-mongoid (2.0.1)
+      database_cleaner-core (~> 2.0.0)
+      mongoid
     date (3.3.4)
     debug (1.9.2)
       irb (~> 1.10)
@@ -296,6 +300,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   csv (~> 3.3.0)
+  database_cleaner-mongoid
   debug
   dry-monads (~> 1.6.0)
   dry-validation (~> 1.10.0)

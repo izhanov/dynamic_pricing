@@ -49,6 +49,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
   gem "rspec-rails", "~> 6.1.0"
   gem "mongoid-rspec"
+  gem "database_cleaner-mongoid"
 end
 
 

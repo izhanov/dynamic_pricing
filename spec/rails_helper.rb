@@ -55,4 +55,19 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include Mongoid::Matchers, type: :model
+
+  config.before(:suite) do
+    DatabaseCleaner[:mongoid].strategy = :deletion
+    DatabaseCleaner.clean
+  end
+
+  # Technically this is unneeded for truncation but is the equivalent of what you are doing
+  config.before(:context) do |example|
+    DatabaseCleaner.start
+  end
+
+  # Truncate the DB after each context.
+  config.after(:context) do |example|
+    DatabaseCleaner.clean
+  end
 end
