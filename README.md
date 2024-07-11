@@ -35,7 +35,7 @@ The dynamic pricing system is implemented in a very simplified manner by selecti
 1. The initial price when importing products (default_price in the Product model)
 2. The price by demand (price_by_demand in the Product Dymamic Price model) - the price is calculated based on the rank of the product. Rank of the product updates every time when product was added to order. Rank of the product is calculated by the formula: `rank = previous_rank + (requested_qty) / 100.0` The price follows the rule:
  - If the rank above 7 the price is increased by 1.07 times.
- – Increase price can't be more than 75% of the initial price.
+ - Increase price can't be more than 75% of the initial price.
 
 3. The price by inventory (price_by_inventory in the Product Dymamic Price model) - the price is calculated based on the qty of the product. The price is calculated by the follow rules:
  - If the product quantity (qty) is below 50, the price is increased by 1.5 times.
