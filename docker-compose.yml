@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Rails application service
+  app:
+    build:
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      DATABASE_URL: mongodb://mongodb:27017/myapp_development
+      REDIS_URL: redis://redis:6379/1
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: /run/secrets/rails_master_key
+      COMPETITOR_API_URL: https://sinatra-pricing-api.fly.dev/prices
+      COMPETITOR_API_KEY: demo123
+
+    command: bash -c "bundle install && bundle exec rails server -b '0.0.0.0'"
+    secrets:
+      - rails_master_key
+
+  # Sidekiq service
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sidekiq
+    working_dir: /myapp
+    volumes:
+      - .:/myapp
+    depends_on:
+      - redis
+      - mongodb
+    environment:
+      DATABASE_URL: mongodb://mongodb:27017/myapp_development
+      REDIS_URL: redis://redis:6379/1
+      RAILS_ENV: development
+      COMPETITOR_API_URL: https://sinatra-pricing-api.fly.dev/prices
+      COMPETITOR_API_KEY: demo123
+
+    command: bundle exec sidekiq
+
+  # Redis service
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # MongoDB service
+  mongodb:
+    image: mongodb/mongodb-community-server
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+
+secrets:
+  rails_master_key:
+    file: config/master.key

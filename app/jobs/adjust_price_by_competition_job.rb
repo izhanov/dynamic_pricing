@@ -18,8 +18,8 @@ class AdjustPriceByCompetitionJob
 
   def fetch_competitor_products
     conn.get(
-      Rails.application.credentials.competitor_api_url,
-      {api_key: Rails.application.credentials.competitor_api_key}
+      ENV["COMPETITOR_API_URL"],
+      {api_key: ENV["COMPETITOR_API_KEY"]}
     )
   end
 
@@ -32,7 +32,7 @@ class AdjustPriceByCompetitionJob
             write_timeout: 1
       }
     }
-    @conn ||= Faraday.new() do |faraday|
+    @conn ||= Faraday.new(request_options) do |faraday|
       faraday.request :json
       faraday.response :json
       faraday.response :raise_error

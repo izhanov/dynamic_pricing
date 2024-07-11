@@ -18,6 +18,24 @@ RSpec.describe Operations::API::Office::Products::Import do
       end
     end
 
+    context "when the file is not a CSV" do
+      it "returns a failure" do
+        operation = described_class.new
+        file = ActionDispatch::Http::UploadedFile.new(
+          tempfile: File.open(Rails.root.join("spec", "fixtures", "files", "invalid.txt")),
+          filename: "invalid_file.txt",
+          type: "text/plain"
+        )
+
+        result = operation.call(file)
+
+        expect(result).to be_failure
+        expect(result.failure).to(
+          eq([:validation_error, { file: ["file format is invalid"] }])
+        )
+      end
+    end
+
     context "when the file is valid" do
       it "returns a success and create products" do
         operation = described_class.new
