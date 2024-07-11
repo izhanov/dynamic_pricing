@@ -8,10 +8,15 @@ production:
 
 :scheduler:
   :schedule:
-    adjust_price_by_competitor:
-      cron: '0 0 * * *'
-      class: 'AdjustPriceByCompetitorJob'
-    adjust_price_by_inventory_levels:
+    adjust_price_by_inventory:
+      cron: '*/5 * * * *'
+      class: 'AdjustPriceByInventoryJob'
+    adjust_price_by_demands:
+      cron: '*/5 * * * *'
+      class: 'AdjustPriceByDemandJob'
+    adjust_price_by_competition:
       cron: '0 */1 * * *'
-      class: 'AdjustPriceByInventoryLevelsJob'
+      class: 'AdjustPriceByCompetitionJob'
+
+
 

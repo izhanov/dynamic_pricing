@@ -1,24 +1,33 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a simple e-commerce platform with a dynamic pricing engine that adjusts product prices in real-time based on demand, inventory levels, and competitor prices
 
-Things you may want to cover:
+## Requirements
+- Ruby 3.3.1
+- Rails 7.1.3.4
+- MonogoDB
+- Sidekiq
+- Redis
 
-* Ruby version
+## Installation
 
-* System dependencies
+1. Clone the repository
+```
+git clone https://github.com/izhanov/dynamic_pricing.git
+```
 
-* Configuration
+2. Install dependencies
+```
+bundle install
+```
 
-* Database creation
+3. Start the server
+```
+rails s
+```
 
-* Database initialization
+4. Start Sidekiq
+```
+bundle exec sidekiq
+```
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...

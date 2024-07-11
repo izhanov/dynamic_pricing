@@ -9,6 +9,13 @@ RSpec.describe API::Web::OrdersController, type: :controller do
     context "when the order is valid" do
       it "creates the order" do
         product = Product.create!(name: "Product", category: "Category", default_price: 10, qty: 10)
+        product_dynamic_price = ProductDynamicPrice.create!(
+          product_id: product.id,
+          price_by_demand: 13,
+          price_by_inventory_level: 12,
+          price_by_competition: 11
+        )
+
         order_params = {
           user_id: 1,
           note: "Note",

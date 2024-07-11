@@ -8,6 +8,7 @@ module Operations
           def call(params)
             validated_params = yield validate(params)
             order = yield create_order(validated_params)
+            RankProductJob.perform_async(order.id.to_s)
             Success(order)
           end
 

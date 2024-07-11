@@ -1,3 +1,10 @@
 json.products do
-  json.array! @products, :id, :name, :category, :default_price, :qty
+  json.array! @products do |product|
+    json.id product.id
+    json.name product.name
+    json.category product.category
+    json.current_price product.current_price
+    json.qty product.qty
+    json.rank product.rank
+  end
 end

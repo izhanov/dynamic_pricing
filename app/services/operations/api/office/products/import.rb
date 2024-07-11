@@ -22,11 +22,18 @@ module Operations
 
           def import(file)
             CSV.foreach(file, headers: true) do |row|
-              Product.create!(
+              product = Product.create!(
                 name: row["NAME"],
                 category: row["CATEGORY"],
                 default_price: row["DEFAULT_PRICE"],
                 qty: row["QTY"]
+              )
+
+              ProductDynamicPrice.create!(
+                product: product,
+                price_by_demand: row["DEFAULT_PRICE"],
+                price_by_inventory_level: row["DEFAULT_PRICE"],
+                price_by_competition: row["DEFAULT_PRICE"]
               )
             end
             Success(true)
