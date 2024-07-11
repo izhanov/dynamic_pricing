@@ -284,3 +284,12 @@ Response example:
   ]
 }
 ```
+
+## Testing
+
+__NOTE:__ Before running the tests, you need to be sure that docker compose services are running.
+
+To run the tests, you need to run the following command in the root directory of the project:
+```bash
+rspec
+```
