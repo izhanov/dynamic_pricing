@@ -7,7 +7,9 @@ module Operations
         class Import < Operations::API::Base
           def call(file)
             validated_file = yield validate(file)
-            yield import(validated_file)
+            extracted_data = extract_data_from(validated_file)
+            validated_data = yield validate_data(extracted_data)
+            yield import(validated_data)
             Success(true)
           end
 
@@ -20,23 +22,53 @@ module Operations
               .or { |failure| Failure[:validation_error, failure.errors.to_h] }
           end
 
-          def import(file)
-            CSV.foreach(file, headers: true) do |row|
-              product = Product.create!(
+          def extract_data_from(file)
+            CSV.foreach(file, headers: true).map do |row|
+              {
                 name: row["NAME"],
                 category: row["CATEGORY"],
                 default_price: row["DEFAULT_PRICE"],
                 qty: row["QTY"]
-              )
-
-              ProductDynamicPrice.create!(
-                product: product,
-                price_by_demand: row["DEFAULT_PRICE"],
-                price_by_inventory_level: row["DEFAULT_PRICE"],
-                price_by_competition: row["DEFAULT_PRICE"]
-              )
+              }
             end
+          end
+
+          def validate_data(data)
+            validation = Validations::API::Office::Products::ImportRowSchema.new
+
+            failures = collect_failures(data, validation)
+
+            failures.empty? ? Success(data) : Failure[:validation_error, failures]
+          end
+
+          def collect_failures(data, validation)
+            data.each_with_object([]).with_index do |(row, acc), index|
+              result = validation.call(row)
+
+              if result.failure?
+                acc << { row_number: index + 1 }.merge(result.errors.to_h)
+              end
+            end
+          end
+
+          def import(data)
+            products_insert_result = Product.collection.insert_many(data)
+            products_ids = products_insert_result.inserted_ids
+            product_dynamic_prices_insert(products_ids)
             Success(true)
+          end
+
+          def product_dynamic_prices_insert(products_ids)
+            products = Product.find(products_ids).pluck(:id, :default_price)
+            dynamic_prices_data = products.map do |product|
+              {
+                product_id: product[0],
+                price_by_demand: product[1],
+                price_by_inventory_level: product[1],
+                price_by_competition: product[1]
+              }
+            end
+            ProductDynamicPrice.collection.insert_many(dynamic_prices_data)
           end
         end
       end

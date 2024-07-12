@@ -56,6 +56,7 @@ group :development, :test do
   gem "mongoid-rspec"
   gem "database_cleaner-mongoid"
   gem "webmock"
+  gem "dotenv-rails"
 end
 
 

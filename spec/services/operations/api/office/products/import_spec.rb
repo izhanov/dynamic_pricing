@@ -16,6 +16,35 @@ RSpec.describe Operations::API::Office::Products::Import do
           eq([:validation_error, { file: ["must be ActionDispatch::Http::UploadedFile"] }])
         )
       end
+
+      context "when data in file invalid" do
+        it "returns failure" do
+          operation = described_class.new
+          file = File.new(Rails.root.join("spec", "fixtures", "files", "invalid_inventory.csv"))
+
+          uploaded_file = ActionDispatch::Http::UploadedFile.new(
+            tempfile: file,
+            filename: "invalid_inventory.csv",
+            type: "text/csv"
+          )
+
+          result = operation.call(uploaded_file)
+          expect(result).to be_failure
+
+          expect(result.failure).to(
+            match_array(
+              [
+                :validation_error,
+                [
+                  {:default_price=>["is missing"], :row_number=>2},
+                  {:category=>["is missing"], :row_number=>8},
+                  {:name=>["is missing"], :row_number=>10}
+                ]
+              ]
+            )
+          )
+        end
+      end
     end
 
     context "when the file is not a CSV" do
