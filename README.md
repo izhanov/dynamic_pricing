@@ -293,3 +293,13 @@ To run the tests, you need to run the following command in the root directory of
 ```bash
 rspec
 ```
+
+## Troubleshooting
+
+1. __If you want connect to MongoDB from your local machine, you need update /etc/hosts file with the following line__:
+
+```bash
+127.0.0.1 mongodb_1
+127.0.0.1 mongodb_2
+127.0.0.1 mongodb_3
+```
