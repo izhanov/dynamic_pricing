@@ -10,7 +10,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - mongodb
+      - mongodb_1
       - redis
     environment:
       DATABASE_URL: mongodb://mongodb:27017/myapp_development
@@ -20,7 +20,7 @@ services:
       COMPETITOR_API_URL: https://sinatra-pricing-api.fly.dev/prices
       COMPETITOR_API_KEY: demo123
 
-    command: bash -c "bundle install && bundle exec rails server -b '0.0.0.0'"
+    command: bash -c "bundle install && bundle exec rake db:mongoid:create_indexes && bundle exec rails server -b '0.0.0.0'"
     secrets:
       - rails_master_key
 
@@ -35,7 +35,7 @@ services:
       - .:/myapp
     depends_on:
       - redis
-      - mongodb
+      - mongodb_1
     environment:
       DATABASE_URL: mongodb://mongodb:27017/myapp_development
       REDIS_URL: redis://redis:6379/1
@@ -54,17 +54,72 @@ services:
       - "6379:6379"
 
   # MongoDB service
-  mongodb:
-    image: mongodb/mongodb-community-server
-    container_name: mongodb
-    restart: always
+  mongodb_1:
+    image: mongo:7
+    hostname: mongodb_1
+    command: --replSet rs1 --keyFile /etc/mongo-replication.key --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    healthcheck:
+      test: "mongosh --host mongodb_1:27017 -u root -p root --authenticationDatabase admin dynamic_pricing_development --eval 'db.runCommand({ping: 1})' | grep -q 'ok: 1'"
     ports:
-      - "27017:27017"
+      - 27017:27017
+    expose:
+      - 27017
     volumes:
-      - mongodb_data:/data/db
+      - mongodb_data_1:/data/db
+      - ./bin/mongos/mongo_repl.key:/etc/mongo-replication.key
+
+  mongodb_2:
+    image: mongo:7
+    hostname: mongodb_2
+    command: --replSet rs1 --keyFile /etc/mongo-replication.key --port 27018 --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    expose:
+      - 27018
+    ports:
+      - 27018:27018
+    volumes:
+      - mongodb_data_2:/data/db
+      - ./bin/mongos/mongo_repl.key:/etc/mongo-replication.key
+    depends_on:
+      - mongodb_1
+
+  mongodb_3:
+    image: mongo:7
+    hostname: mongodb_3
+    command: --replSet rs1 --keyFile /etc/mongo-replication.key --port 27019 --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    expose:
+      - 27019
+    ports:
+      - 27019:27019
+    volumes:
+      - mongodb_data_3:/data/db
+      - ./bin/mongos/mongo_repl.key:/etc/mongo-replication.key
+    depends_on:
+      - mongodb_1
+
+  mongo_init:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    depends_on:
+      mongodb_1:
+        condition: service_healthy
+    command: >
+      mongosh --host mongodb_1:27017 -u root -p root --authenticationDatabase admin dynamic_pricing_development --eval "rs.initiate({_id: 'rs1', members: [{_id: 0, host: 'mongodb_1:27017'}, {_id: 1, host: 'mongodb_2:27018'}, {_id: 2, host: 'mongodb_3:27019'}]})"
 
 volumes:
-  mongodb_data:
+  mongodb_data_1:
+  mongodb_data_2:
+  mongodb_data_3:
 
 secrets:
   rails_master_key:

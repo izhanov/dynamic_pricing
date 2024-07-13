@@ -11,6 +11,8 @@ class Product
 
   has_one :product_dynamic_price, dependent: :destroy
 
+  index({name: 1, category: 1}, {unique: true})
+
   def decrement_qty!(qty = 1)
     update_attributes!(qty: self.qty - qty)
   end

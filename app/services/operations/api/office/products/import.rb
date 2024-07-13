@@ -52,13 +52,18 @@ module Operations
           end
 
           def import(data)
-            products_insert_result = Product.collection.insert_many(data)
-            products_ids = products_insert_result.inserted_ids
-            product_dynamic_prices_insert(products_ids)
+            Mongoid.transaction do
+              products_insert_result = Product.collection.insert_many(data)
+              products_ids = products_insert_result.inserted_ids
+              product_dynamic_prices_insert(products_ids)
+            end
             Success(true)
+          rescue Mongo::Error::BulkWriteError => e
+            Failure[:database_error, e.message]
           end
 
           def product_dynamic_prices_insert(products_ids)
+
             products = Product.find(products_ids).pluck(:id, :default_price)
             dynamic_prices_data = products.map do |product|
               {
@@ -68,6 +73,7 @@ module Operations
                 price_by_competition: product[1]
               }
             end
+
             ProductDynamicPrice.collection.insert_many(dynamic_prices_data)
           end
         end
