@@ -34,7 +34,7 @@ module Operations
           end
 
           def validate_data(data)
-            validation = Validations::API::Office::Products::ImportRowSchema.new
+            validation = Validations::API::Office::Products::CreateSchema.new
 
             failures = collect_failures(data, validation)
 

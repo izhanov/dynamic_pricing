@@ -47,7 +47,7 @@ This rule processing in the background by the Sidekiq worker every 5 minutes.
 
 ## Awailable endpoints (Recommended to use Postman)
 
-1. __GET /api/office/products/import__ - import products from CSV file. CSV must be certain format. Example of CSV file: /spec/fixtures/inventory.csv
+1. __POST /api/office/products/import__ - import products from CSV file. CSV must be certain format. Example of CSV file: /spec/fixtures/inventory.csv
 
 ```bash
   curl 'localhost:3000/api/office/products/import' \--form 'file=@/path/to/file_name'
@@ -89,7 +89,37 @@ If the file is not in CSV, the response will be:
     ]
   }
   ```
-2. __GET /api/office/products/:id__ - get product by id
+
+2. __GET /api/office/products__ - get all products
+
+```bash
+  curl 'localhost:3000/api/office/products'
+```
+
+Response example:
+```json
+{
+  "products": [
+    {
+      "id": "668f9f878ff8747d73fea414",
+      "name": "MC Hammer Pants",
+      "category": "Footwear",
+      "default_price": "3005.0",
+      "qty": 265,
+      "rank": 0.0
+    },
+    {
+      "id": "668f9f878ff8747d73fea415",
+      "name": "MC Hammer Pants",
+      "category": "Footwear",
+      "default_price": "3005.0",
+      "qty": 265,
+      "rank": 0.0
+    }
+  ]
+}
+```
+3. __GET /api/office/products/:id__ - get product by id
 
 ```bash
   curl 'localhost:3000/api/office/products/668f9f878ff8747d73fea414'
@@ -108,7 +138,49 @@ Response example:
 }
 ```
 
-3. __GET /api/web/products/__ - get all products
+4. __POST /api/office/products__ - create a product
+
+```bash
+  curl -X POST 'localhost:3000/api/office/products' \--header 'Content-Type: application/json' \--data-raw '{
+    "product": {
+      "name": "MC Hammer Pants",
+      "category": "Footwear",
+      "default_price": 3005.0,
+      "qty": 265
+    }
+  }'
+```
+
+Response example:
+If the product is successfully created, the response will be:
+```json
+{
+  "product": {
+    "id": "668f9f878ff8747d73fea414",
+    "name": "MC Hammer Pants",
+    "category": "Footwear",
+    "default_price": "3005.0",
+    "qty": 265
+  }
+}
+```
+
+If the product wasn't created, the response will be followed structure:
+```json
+{
+  "success": false,
+  "error": [
+    "validation_error",
+    {
+      "name": [
+        "is missing"
+      ]
+    }
+  ]
+}
+```
+
+5. __GET /api/web/products/__ - get all products
 
 ```bash
   curl 'localhost:3000/api/web/products'
@@ -138,7 +210,7 @@ Response example:
 }
 ```
 
-4. __POST /api/web/orders__ - create order
+6. __POST /api/web/orders__ - create order
 
 ```bash
   curl -X POST 'localhost:3000/api/web/orders' \--header 'Content-Type: application/json' \--data-raw '{
@@ -175,18 +247,16 @@ If the order wasn't created, the response will be followed structure:
 ```json
 {
   "success": false,
-  "error": [
-    "validation_error",
-    {
-      "items": [
-        "is missing"
-      ]
-    }
-  ]
+  "error_code": "validation_error",
+  "errors": {
+    "qty": [
+      "is missing"
+    ]
+  }
 }
 ```
 
-5. __GET /api/web/orders/:id__ - get order by id
+7. __GET /api/web/orders/:id__ - get order by id
 
 ```bash
   curl 'localhost:3000/api/web/orders/668f9f878ff8747d73fea414'
@@ -221,7 +291,7 @@ Response example:
   }
 }
 ```
-6. __GET /api/web/orders__ - get all orders
+8. __GET /api/web/orders__ - get all orders
 
 ```bash
   curl 'localhost:3000/api/web/orders'

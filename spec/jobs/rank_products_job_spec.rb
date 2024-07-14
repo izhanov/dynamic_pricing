@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe RankProductJob, type: :job do
   describe "#perform" do
     it "updates product rank" do
-      product_1 = Product.create!(name: "Product", category: "Category", default_price: 10, qty: 10)
-      product_2 = Product.create!(name: "Product", category: "Category", default_price: 10, qty: 20)
+      product_1 = Product.create!(name: "Product 1", category: "Category 1", default_price: 10, qty: 10)
+      product_2 = Product.create!(name: "Product 2", category: "Category 2", default_price: 10, qty: 20)
 
       product_1_dynamic_price = ProductDynamicPrice.create!(
         product: product_1,

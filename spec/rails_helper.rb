@@ -61,6 +61,8 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner[:mongoid].strategy = :deletion
+    Product.remove_indexes
+    Product.create_indexes
     DatabaseCleaner.clean
   end
 

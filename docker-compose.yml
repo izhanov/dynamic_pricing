@@ -5,6 +5,7 @@ services:
   app:
     build:
       dockerfile: ./Dockerfile
+    restart: always
     volumes:
       - .:/myapp
     ports:
